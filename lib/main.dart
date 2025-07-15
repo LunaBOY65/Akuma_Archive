@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'Favorites.dart';
 import 'settings.dart';
+import 'dart:ui';
 
 void main() {
   runApp(const MyApp());
@@ -24,7 +25,7 @@ class MyApp extends StatelessWidget {
           unselectedItemColor: Colors.white70,
         ),
       ),
-      home: MyHomePage(title: 'Devil Fruit'),
+      home: MyHomePage(title: '🍎 Home'),
     );
   }
 }
@@ -105,67 +106,75 @@ class MyHomeContent extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      children: [
-        // Header Section
-        Container(
-          width: double.infinity,
-          margin: const EdgeInsets.all(16),
-          padding: const EdgeInsets.all(20),
-          decoration: BoxDecoration(
-            // ใช้สีไล่ระดับ (gradient) เพื่อให้ดูสวยขึ้น
-            gradient: LinearGradient(
-              colors: [Colors.indigo[300]!, Colors.indigo[600]!],
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
+    return CustomScrollView(
+      slivers: [
+        // Header Section with Background Image
+        SliverToBoxAdapter(
+          child: Container(
+            width: double.infinity,
+            margin: const EdgeInsets.all(16),
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(20),
+              child: Stack(
+                children: [
+                  // รูปพื้นหลัง
+                  Image.asset(
+                    'assets/home/Background.png',
+                    width: double.infinity,
+                    height: 150, // กำหนดความสูงตามต้องการ
+                    fit: BoxFit.cover,
+                  ),
+
+                  // เลเยอร์เบลอ
+                  BackdropFilter(
+                    filter: ImageFilter.blur(sigmaX: 2, sigmaY: 2),
+                    child: Container(
+                      width: double.infinity,
+                      height: 150,
+                      color: Colors.black.withOpacity(
+                        0.4,
+                      ), // ช่วยให้ข้อความเด่นขึ้น
+                    ),
+                  ),
+
+                  // ข้อความด้านใน
+                  Padding(
+                    padding: const EdgeInsets.all(20),
+                    child: Column(
+                      children: const [
+                        Text(
+                          'Devil Fruit Collection',
+                          style: TextStyle(
+                            fontSize: 23,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.white,
+                          ),
+                        ),
+                        SizedBox(height: 8),
+                        // เพิ่ม widgets อื่นได้ตามต้องการ
+                      ],
+                    ),
+                  ),
+                ],
+              ),
             ),
-            borderRadius: BorderRadius.circular(20), // มุมโค้ง
-            boxShadow: [
-              BoxShadow(
-                color: Colors.indigo.withOpacity(0.3),
-                blurRadius: 10,
-                offset: const Offset(0, 5),
-              ),
-            ],
-          ),
-          // ใช้ Column เพื่อจัดเรียงข้อความแนวตั้ง
-          child: Column(
-            children: const [
-              Text(
-                '🍎 Devil Fruit Collection', // ชื่อหัวข้อ
-                style: TextStyle(
-                  fontSize: 24,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.white,
-                ),
-              ),
-              SizedBox(height: 8), // เว้นระยะห่าง
-              Text(
-                'สำรวจพลังลึกลับของผลปีศาจ', // คำอธิบาย
-                style: TextStyle(fontSize: 16, color: Colors.white70),
-              ),
-            ],
           ),
         ),
 
-        // Fruits Grid
-        Expanded(
-          child: GridView.count(
-            /// กำหนดค่าต่าง ๆ สำหรับ GridView เช่น จำนวนคอลัมน์, ระยะห่าง, และอัตราส่วนของแต่ละช่อง
-            ///
-            /// - `crossAxisCount`: จำนวนคอลัมน์ใน GridView (เช่น 2 คอลัมน์)
-            /// - `padding`: กำหนดระยะขอบรอบ GridView
-            /// - `crossAxisSpacing` และ `mainAxisSpacing`: ระยะห่างระหว่างช่องแนวนอนและแนวตั้ง
-            /// - `childAspectRatio`: อัตราส่วนความกว้างต่อความสูงของแต่ละช่อง
-            ///
-            /// ในแต่ละช่อง จะใช้ Container เพื่อแสดงข้อมูลผลไม้ โดยตกแต่งด้วยสีพื้นขาว, มุมโค้งมน และเงาเบา ๆ
-            /// เหมาะสำหรับมือใหม่ที่ต้องการสร้าง GridView ที่ดูสวยงามและอ่านง่าย
-            crossAxisCount: 2,
-            padding: const EdgeInsets.all(16),
-            crossAxisSpacing: 12,
-            mainAxisSpacing: 12,
-            childAspectRatio: 0.85,
-            children: fruits.map((fruit) {
+        // ระยะห่างระหว่าง Header และ GridView
+        const SliverToBoxAdapter(child: SizedBox(height: 8)),
+        // Fruits Grid Section
+        SliverPadding(
+          padding: const EdgeInsets.all(16),
+          sliver: SliverGrid(
+            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+              crossAxisCount: 2,
+              crossAxisSpacing: 12,
+              mainAxisSpacing: 12,
+              childAspectRatio: 0.85,
+            ),
+            delegate: SliverChildBuilderDelegate((context, index) {
+              final fruit = fruits[index];
               return Container(
                 decoration: BoxDecoration(
                   color: Colors.white,
@@ -183,7 +192,6 @@ class MyHomeContent extends StatelessWidget {
                   children: [
                     // Emoji Icon
                     Container(
-                      //ใช้ Container เมื่อจำเป็นต้องปรับแต่ง หรือจัดวาง widget
                       width: 60,
                       height: 60,
                       decoration: BoxDecoration(
@@ -198,11 +206,8 @@ class MyHomeContent extends StatelessWidget {
                       ),
                     ),
                     const SizedBox(height: 12),
-
                     // Fruit Name
                     Padding(
-                      /*ใช้ Padding เฉยๆเพราะ layout ไม่ได้จัดอะไรมาก ใช้แค่จัดระยะขอบรอบนอกเฉยๆ
-                      ส่วน Container เอาไว้จัด layout แบบซับซ้อนกว่า*/
                       padding: const EdgeInsets.symmetric(horizontal: 8),
                       child: Text(
                         fruit['name']!,
@@ -217,7 +222,6 @@ class MyHomeContent extends StatelessWidget {
                       ),
                     ),
                     const SizedBox(height: 8),
-
                     // Type Badge
                     Container(
                       padding: const EdgeInsets.symmetric(
@@ -240,7 +244,7 @@ class MyHomeContent extends StatelessWidget {
                   ],
                 ),
               );
-            }).toList(),
+            }, childCount: fruits.length),
           ),
         ),
       ],
